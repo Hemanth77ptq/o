@@ -31,7 +31,7 @@ users_collection = db.users
 bot = telebot.TeleBot(TOKEN)
 REQUEST_INTERVAL = 1
 
-blocked_ports = [8700, 20000, 443, 17500, 9031, 20002, 20001]  # Blocked ports list
+blocked_ports = [8700, 2000]  # Blocked ports list
 
 async def start_asyncio_thread():
     asyncio.set_event_loop(loop)
@@ -114,13 +114,13 @@ def approve_or_disapprove_user(message):
     days = int(cmd_parts[3]) if len(cmd_parts) >= 4 else 0
 
     if action == '/approve':
-        if plan == 1:  # Instant Plan 🧡
+        if plan == 1:  # Instant Plan 
             if users_collection.count_documents({"plan": 1}) >= 99:
-                bot.send_message(chat_id, "*Approval failed: Instant Plan 🧡 limit reached (99 users).*", parse_mode='Markdown')
+                bot.send_message(chat_id, "*Approval failed: Instant Plan  limit reached (99 users).*", parse_mode='Markdown')
                 return
-        elif plan == 2:  # Instant++ Plan 💥
+        elif plan == 2:  # Instant++ Plan 
             if users_collection.count_documents({"plan": 2}) >= 499:
-                bot.send_message(chat_id, "*Approval failed: Instant++ Plan 💥 limit reached (499 users).*", parse_mode='Markdown')
+                bot.send_message(chat_id, "*Approval failed: Instant++ Plan  limit reached (499 users).*", parse_mode='Markdown')
                 return
 
         valid_until = (datetime.now() + timedelta(days=days)).date().isoformat() if days > 0 else datetime.now().date().isoformat()
@@ -152,11 +152,11 @@ def attack_command(message):
             return
 
         if user_data['plan'] == 1 and users_collection.count_documents({"plan": 1}) > 99:
-            bot.send_message(chat_id, "Your Instant Plan 🧡 is currently not available due to limit reached.")
+            bot.send_message(chat_id, "Your Instant Plan  is currently not available due to limit reached.")
             return
 
         if user_data['plan'] == 2 and users_collection.count_documents({"plan": 2}) > 499:
-            bot.send_message(chat_id, "Your Instant++ Plan 💥 is currently not available due to limit reached.")
+            bot.send_message(chat_id, "Your Instant++ Plan  is currently not available due to limit reached.")
             return
 
         bot.send_message(chat_id, "Enter the target IP, port, and duration (in seconds) separated by spaces.")
@@ -176,11 +176,11 @@ def attack_command(message):
             return
 
         if user_data['plan'] == 1 and users_collection.count_documents({"plan": 1}) > 99:
-            bot.send_message(chat_id, "*Your Instant Plan 🧡 is currently not available due to limit reached.*", parse_mode='Markdown')
+            bot.send_message(chat_id, "*Your Instant Plan  is currently not available due to limit reached.*", parse_mode='Markdown')
             return
 
         if user_data['plan'] == 2 and users_collection.count_documents({"plan": 2}) > 499:
-            bot.send_message(chat_id, "*Your Instant++ Plan 💥 is currently not available due to limit reached.*", parse_mode='Markdown')
+            bot.send_message(chat_id, "*Your Instant++ Plan  is currently not available due to limit reached.*", parse_mode='Markdown')
             return
 
         bot.send_message(chat_id, "*Enter the target IP, port, and duration (in seconds) separated by spaces.*", parse_mode='Markdown')
@@ -201,7 +201,7 @@ def process_attack_command(message):
             return
 
         asyncio.run_coroutine_threadsafe(run_attack_command_async(target_ip, target_port, duration), loop)
-        bot.send_message(message.chat.id, f"*Attack started 💥\n\nHost: {target_ip}\nPort: {target_port}\nTime: {duration}*", parse_mode='Markdown')
+        bot.send_message(message.chat.id, f"*Attack started \n\nHost: {target_ip}\nPort: {target_port}\nTime: {duration}*", parse_mode='Markdown')
     except Exception as e:
         logging.error(f"Error in processing attack command: {e}")
 
@@ -215,12 +215,12 @@ def send_welcome(message):
     markup = ReplyKeyboardMarkup(row_width=2, resize_keyboard=True, one_time_keyboard=True)
 
     # Create buttons
-    btn1 = KeyboardButton("Instant Plan 🧡")
-    btn2 = KeyboardButton("Instant++ Plan 💥")
-    btn3 = KeyboardButton("Canary Download✔️")
-    btn4 = KeyboardButton("My Account🏦")
-    btn5 = KeyboardButton("Help❓")
-    btn6 = KeyboardButton("Contact admin✔️")
+    btn1 = KeyboardButton("Instant Plan ")
+    btn2 = KeyboardButton("Instant++ Plan ")
+    btn3 = KeyboardButton("Canary Download")
+    btn4 = KeyboardButton("My Account")
+    btn5 = KeyboardButton("Help")
+    btn6 = KeyboardButton("Contact admin")
 
     # Add buttons to the markup
     markup.add(btn1, btn2, btn3, btn4, btn5, btn6)
@@ -229,14 +229,14 @@ def send_welcome(message):
 
 @bot.message_handler(func=lambda message: True)
 def handle_message(message):
-    if message.text == "Instant Plan 🧡":
+    if message.text == "Instant Plan ":
         bot.reply_to(message, "*Instant Plan selected*", parse_mode='Markdown')
-    elif message.text == "Instant++ Plan 💥":
+    elif message.text == "Instant++ Plan ":
         bot.reply_to(message, "*Instant++ Plan selected*", parse_mode='Markdown')
         attack_command(message)
-    elif message.text == "Canary Download✔️":
+    elif message.text == "Canary Download":
         bot.send_message(message.chat.id, "*Please use the following link for Canary Download: https://t.me/SOULCRACKS/10599*", parse_mode='Markdown')
-    elif message.text == "My Account🏦":
+    elif message.text == "My Account":
         user_id = message.from_user.id
         user_data = users_collection.find_one({"user_id": user_id})
         if user_data:
@@ -251,9 +251,9 @@ def handle_message(message):
         else:
             response = "*No account information found. Please contact the administrator.*"
         bot.reply_to(message, response, parse_mode='Markdown')
-    elif message.text == "Help❓":
+    elif message.text == "Help":
         bot.reply_to(message, "*Help selected*", parse_mode='Markdown')
-    elif message.text == "Contact admin✔️":
+    elif message.text == "Contact admin":
         bot.reply_to(message, "*Contact admin selected*", parse_mode='Markdown')
     else:
         bot.reply_to(message, "*Invalid option*", parse_mode='Markdown')
